@@ -39,7 +39,7 @@ export default function Home() {
         </div>
         <div className="relationshipArea" style={{ gridArea: 'relationshipArea' }}>
           <RelationshipBoxWrapper>
-            <h2 className="SmallTitle">Pessoas da Comunidade</h2>
+            <h2 className="smallTitle">Pessoas da Comunidade ({favoritePeople.length})</h2>
 
             <ul>
               {favoritePeople.map((githubUser) => {
