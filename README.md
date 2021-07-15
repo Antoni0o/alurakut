@@ -16,5 +16,5 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 ## 💻 Projeto
 
 O Alurakut é basicamente uma recriação do antigo orkut, usando tecnologias mais atuais e com um design mais moderno.
-https://alurakut-plum-eta.vercel.app/
+
 
