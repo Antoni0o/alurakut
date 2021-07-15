@@ -30,7 +30,7 @@ const GlobalStyle = createGlobalStyle`
     display: block;
   }
 
-
+  ${AlurakutStyles}
 `
 
 const theme = {

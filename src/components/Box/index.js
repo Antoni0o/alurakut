@@ -7,7 +7,7 @@ const Box = styled.div`
   margin-bottom: 1rem;
   .boxLink {
     font-size: 1.4rem;
-    color: #2E7BB4;
+    color: #4895ef;
     text-decoration: none;
     font-weight: 800;
   }
@@ -35,6 +35,7 @@ const Box = styled.div`
     border-bottom-color: #ECF2FA;
   }
   input {
+    outline: none;
     width: 100%;
     background-color: #F4F4F4;
     color: #333333;
@@ -42,17 +43,25 @@ const Box = styled.div`
     padding: 1.4rem 1.6rem;
     margin-bottom: 1.4rem;
     border-radius: 10000px;
+    transition: .1s;
     ::placeholder {
       color: #333333;
       opacity: 1;
     }
   }
+  
   button {
+    outline: none;
     border: 0;
     padding: .8rem 1.2rem;
     color: #FFFFFF;
     border-radius: 10000px;
-    background-color: #6F92BB;
+    background-color: #4895ef;
+    cursor: pointer;
+    transition: .3s;  
+  }
+  button:hover {
+    opacity: 0.8;
   }
 `
 

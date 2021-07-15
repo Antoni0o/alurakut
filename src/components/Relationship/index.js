@@ -47,6 +47,6 @@ export const RelationshipBoxWrapper = styled(Box)`
         bottom: 0;
         z-indeX: 1;
         background-image: linear-gradient(0deg,#00000073,transparent);
-        }
+        } 
     }
 `

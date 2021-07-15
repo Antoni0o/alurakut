@@ -39,7 +39,7 @@ export function AlurakutMenu({ githubUser }) {
             Sair
           </a>
           <div>
-            <input placeholder="Pesquisar no Orkut" />
+            <input placeholder="Pesquisar no Alurakut" />
           </div>
         </nav>
 
@@ -139,6 +139,7 @@ AlurakutMenu.Wrapper = styled.header`
       }
     }
     input {
+      outline: none;
       color: #ffffff;
       background: #4895ef;
       padding: 10px 42px;
@@ -222,12 +223,16 @@ export function AlurakutProfileSidebarMenuDefault() {
 AlurakutProfileSidebarMenuDefault.Wrapper = styled.div`
   a {
     font-size: 12px;
-    color: #2E7BB4;
+    color: #4895ef;
     margin-bottom: 16px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     text-decoration: none;
+    transition: .1s;
+    &:hover {
+      opacity: 0.8;
+    }
     img {
       width: 16px;
       height: 16px;
@@ -295,9 +300,12 @@ OrkutNostalgicIconSet.List = styled.ul`
     grid-template-areas:
       "title title"
       "number number"; 
-    
+    transition: .3s;
     &:not(:last-child) {
       margin-right: 5px;
+    }
+    &:hover{
+      opacity: 0.8;
     }
     .OrkutNostalgicIconSet__title {
       display: block;
@@ -324,8 +332,8 @@ const AlurakutLoginScreen = css`
     --backgroundSecondary: #F1F9FE;
     --backgroundTertiary: #FFFFFF;
     --backgroundQuarternary: #BBCDE8;
-    --colorPrimary: #2E7BB4;
-    --colorSecondary: #388BB0;
+    --colorPrimary: #4361ee;
+    --colorSecondary: #4895ef;
     --colorTertiary: #2F4A71;
     --colorQuarternary: #D81D99;
     --textPrimaryColor: #333333;
