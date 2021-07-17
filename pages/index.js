@@ -8,7 +8,7 @@ import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet 
 function ProfileSidebar(props) {
   return (
     <Box as="aside">
-      <img src={`https://www.github.com/${props.githubUser}.png`} style={{ borderRadius: '.8rem' }} alt="foto de perfil" />
+      <img src={`https://www.github.com/${props.githubUser}.png`} style={{ borderRadius: '50%' }} alt="foto de perfil" />
       <hr />
 
       <p>
@@ -23,25 +23,103 @@ function ProfileSidebar(props) {
   )
 }
 
+function RelationshipBox(props) {
+  const limitedRelationships = props.items.slice(0, 6)
+  return (
+    <RelationshipBoxWrapper>
+      <h2 className="smallTitle">{props.title} ({props.items.length})</h2>
+
+      <ul>
+        {limitedRelationships.map((props) => {
+          return (
+            <li key={props.id}>
+              <a href={`https://github.com/${props.login}`}>
+                <img src={`https://github.com/${props.login}.png`} />
+                <span>{props.login}</span>
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+
+    </RelationshipBoxWrapper>
+  )
+}
+
+function CommunitiesBox(props) {
+  const limitedCommunities = props.items.slice(0, 6)
+
+  return (
+    <RelationshipBoxWrapper>
+      <h2 className="smallTitle">{props.title} ({props.items.length})</h2>
+
+      <ul>
+        {limitedCommunities.map((props) => {
+          return (
+            <li key={props.id}>
+              <a href={`${props.contentUrl}`}>
+                <img src={`${props.imageUrl}`} />
+                <span>{props.title}</span>
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </RelationshipBoxWrapper>
+  )
+}
+
 export default function Home() {
   const githubUser = 'Antoni0o'
-  const [communities, setCommunities] = React.useState([{
-    id: 15849,
-    title: 'Eu odeio acordar cedo',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
-  }])
-  const favoritePeople = [
-    'omariosouto',
-    'juunegreiros',
-    'peas',
-    'rafaballerini',
-    'filipedeschamps',
-    'lucasmontano'
-  ]
+
+  const [communities, setCommunities] = React.useState([])
+  const [following, setFollowing] = React.useState([])
+  const [followers, setFollowers] = React.useState([])
+  React.useEffect(function () {
+    fetch('https://api.github.com/users/Antoni0o/followers')
+      .then((serverResponse) => {
+        return serverResponse.json()
+      })
+      .then((completeResponse) => {
+        setFollowers(completeResponse)
+      })
+
+    fetch('https://api.github.com/users/Antoni0o/following')
+      .then((serverResponse) => {
+        return serverResponse.json()
+      })
+      .then((completeResponse) => {
+        setFollowing(completeResponse)
+      })
+
+    fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'f90d78b4c44432694c56f693306af0',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        "query": `query {
+          allCommunities {
+            id
+            title
+            imageUrl
+            contentUrl
+            creatorSlug
+          }
+        }`})
+    })
+      .then((response) => response.json())
+      .then((completeResponse) => {
+        const datoCommunities = completeResponse.data.allCommunities;
+        setCommunities(datoCommunities)
+      })
+  }, [])
 
   return (
     <>
-      <AlurakutMenu />
+      <AlurakutMenu githubUser={githubUser} />
 
       <MainGrid>
 
@@ -62,16 +140,27 @@ export default function Home() {
             <form onSubmit={function handleCreateCommunity(e) {
               e.preventDefault()
               const formData = new FormData(e.target)
-              let imageID = Math.floor(Math.random() * 10)
 
               const community = {
-                id: new Date().toISOString(),
                 title: formData.get('title'),
-                image: formData.get('image') || `https://picsum.photos/300/300?${imageID}`
+                imageUrl: formData.get('image'),
+                contentUrl: formData.get('link'),
+                creatorSlug: githubUser
               }
 
-              const updatedCommunities = [...communities, community]
-              setCommunities(updatedCommunities)
+              fetch('/api/communities', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(community)
+              })
+                .then(async (res) => {
+                  const datas = await res.json()
+                  const community = datas.createdRecord
+                  const updatedCommunities = [...communities, community]
+                  setCommunities(updatedCommunities)
+                })
             }}>
               <div>
                 <input
@@ -89,6 +178,14 @@ export default function Home() {
                   type="text"
                 />
               </div>
+              <div>
+                <input
+                  placeholder="Coloque da sua URL comunidade"
+                  name="link"
+                  aria-label="Coloque da sua URL comunidade"
+                  type="text"
+                />
+              </div>
 
               <button>Criar Comunidade</button>
 
@@ -98,41 +195,13 @@ export default function Home() {
         </div>
 
         <div className="relationshipArea" style={{ gridArea: 'relationshipArea' }}>
-          <RelationshipBoxWrapper>
-            <h2 className="smallTitle">Comunidades ({communities.length})</h2>
 
-            <ul>
-              {communities.map((communityContent) => {
-                return (
-                  <li key={communityContent.id}>
-                    <a href={`/users/${communityContent.title}`}>
-                      <img src={`${communityContent.image}`} />
-                      <span>{communityContent.title}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
+          <CommunitiesBox title="Comunidades" items={communities} />
 
-          </RelationshipBoxWrapper>
+          <RelationshipBox title="Seguidores" items={followers} />
 
-          <RelationshipBoxWrapper>
-            <h2 className="smallTitle">Pessoas da Comunidade ({favoritePeople.length})</h2>
+          <RelationshipBox title="Seguindo" items={following} />
 
-            <ul>
-              {favoritePeople.map((githubUser) => {
-                return (
-                  <li key={githubUser}>
-                    <a href={`https://github.com/${githubUser}`}>
-                      <img src={`https://github.com/${githubUser}.png`} />
-                      <span>{githubUser}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-
-          </RelationshipBoxWrapper>
         </div >
 
       </MainGrid >
