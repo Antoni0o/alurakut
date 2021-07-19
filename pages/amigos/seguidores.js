@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import nookies from 'nookies'
 import jwt from 'jsonwebtoken'
 import MainGrid from '../../src/components/MainGrid'
@@ -32,14 +33,16 @@ export default function Page(props) {
                         <h2 className="smallTitle">Seguidores ({followers.length})</h2>
 
                         <ul>
-                            {followers.map((followers) => {
+                            {followers.map((follower) => {
                                 return (
                                     //corrigir aqui, colocar o link do next
-                                    <li key={followers.id}>
-                                        <a href={`https://github.com/${followers.login}`}>
-                                            <img src={`https://github.com/${followers.login}.png`} />
-                                            <span>{followers.login}</span>
-                                        </a>
+                                    <li key={follower.id}>
+                                        <Link href={`../usuario/${follower.login}`}>
+                                            <a>
+                                                <img src={`https://github.com/${follower.login}.png`} />
+                                                <span>{follower.login}</span>
+                                            </a>
+                                        </Link>
                                     </li>
                                 )
                             })}

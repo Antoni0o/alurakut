@@ -5,7 +5,6 @@ import MainGrid from "../../src/components/MainGrid";
 import Box from "../../src/components/Box";
 import { ProfileSidebar } from '../index';
 import { RelationshipBoxWrapper } from '../../src/components/Relationship'
-import RelationshipLink from '../../src/components/RelationshipLink'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../../src/lib/AlurakutCommons';
 
 
@@ -16,13 +15,13 @@ function RelationshipBox(props) {
             <h2 className="smallTitle">{props.title} ({props.items.length})</h2>
 
             <ul>
-                {limitedRelationships.map((props) => {
+                {limitedRelationships.map((user) => {
                     return (
-                        <li key={props.id}>
-                            <Link href={`/usuario/${props.login}`}>
+                        <li key={user.id}>
+                            <Link href={`/usuario/${user.login}`}>
                                 <a>
-                                    <img src={`https://github.com/${props.login}.png`} />
-                                    <span>{props.login}</span>
+                                    <img src={`https://github.com/${user.login}.png`} />
+                                    <span>{user.login}</span>
                                 </a>
                             </Link>
                         </li>
@@ -42,12 +41,12 @@ function CommunitiesBox(props) {
             <h2 className="smallTitle">{props.title} ({props.items.length})</h2>
 
             <ul>
-                {limitedCommunities.map((props) => {
+                {limitedCommunities.map((community) => {
                     return (
-                        <li key={props.id}>
-                            <a href={`${props.contentUrl}`}>
-                                <img src={`${props.imageUrl}`} />
-                                <span>{props.title}</span>
+                        <li key={community.id}>
+                            <a href={`${community.contentUrl}`}>
+                                <img src={`${community.imageUrl}`} />
+                                <span>{community.title}</span>
                             </a>
                         </li>
                     )
@@ -65,22 +64,23 @@ export default function Page() {
     const { otherGithubUser } = router.query
 
     const githubUser = otherGithubUser
+    console.log(otherGithubUser)
 
     const [communities, setCommunities] = React.useState([])
     const [following, setFollowing] = React.useState([])
     const [followers, setFollowers] = React.useState([])
     React.useEffect(function () {
         fetch(`https://api.github.com/users/${githubUser}/followers`)
-            .then((serverResponse) => {
-                return serverResponse.json()
+            .then(async (serverResponse) => {
+                return await serverResponse.json()
             })
             .then((completeResponse) => {
                 setFollowers(completeResponse)
             })
 
         fetch(`https://api.github.com/users/${githubUser}/following`)
-            .then((serverResponse) => {
-                return serverResponse.json()
+            .then(async (serverResponse) => {
+                return await serverResponse.json()
             })
             .then((completeResponse) => {
                 setFollowing(completeResponse)
@@ -109,7 +109,7 @@ export default function Page() {
                 const datoCommunities = completeResponse.data.allCommunities;
                 setCommunities(datoCommunities)
             })
-    }, [])
+    }, [githubUser])
 
     return (
         <>
