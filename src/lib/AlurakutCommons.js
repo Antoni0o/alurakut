@@ -1,10 +1,11 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router'
+import nookies from 'nookies'
 
 const BASE_URL = 'http://alurakut.vercel.app/';
 const v = '1';
-
 
 function Link({ href, children, ...props }) {
   return (
@@ -20,6 +21,7 @@ function Link({ href, children, ...props }) {
 // Menu
 // ================================================================================================================
 export function AlurakutMenu({ githubUser }) {
+  const router = useRouter()
   const [isMenuOpen, setMenuState] = React.useState(false);
   return (
     <AlurakutMenu.Wrapper isMenuOpen={isMenuOpen}>
@@ -27,7 +29,7 @@ export function AlurakutMenu({ githubUser }) {
         <AlurakutMenu.Logo src={`${BASE_URL}/logo.svg`} />
 
         <nav style={{ flex: 1 }}>
-          {[{ name: 'Inicio', slug: '/' }, { name: 'Amigos', slug: '/amigos' }, { name: 'Comunidades', slug: '/comunidades' }].map((menuItem) => (
+          {[{ name: 'Inicio', slug: '/' }, { name: 'Seguidores', slug: '/amigos/seguidores' }, { name: 'Seguindo', slug: '/amigos/seguindo' }, { name: 'Comunidades', slug: '/comunidades' }].map((menuItem) => (
             <Link key={`key__${menuItem.name.toLocaleLowerCase()}`} href={`${menuItem.slug.toLocaleLowerCase()}`}>
               {menuItem.name}
             </Link>
@@ -35,7 +37,10 @@ export function AlurakutMenu({ githubUser }) {
         </nav>
 
         <nav>
-          <a href={`/logout`}>
+          <a onClick={() => {
+            nookies.destroy(null, 'USER_TOKEN')
+            router.push('/login')
+          }}>
             Sair
           </a>
           <div>
@@ -57,13 +62,15 @@ AlurakutMenu.Wrapper = styled.header`
   background-color: #4361ee;
   .alurakutMenuProfileSidebar {
     background: white;
+    height: 100vh;
     position: fixed;
     z-index: 100;
-    padding: 46px;
+    padding: 5rem;
+    padding-top: 7rem;
     bottom: 0;
     left: 0;
     right: 0;
-    top: 48px;
+    top: 0;
     transition: .3s;
     pointer-events: ${({ isMenuOpen }) => isMenuOpen ? 'all' : 'none'};
     opacity: ${({ isMenuOpen }) => isMenuOpen ? '1' : '0'};
@@ -176,7 +183,7 @@ function AlurakutMenuProfileSidebar({ githubUser }) {
         </p>
         <hr />
 
-        <AlurakutProfileSidebarMenuDefault />
+        <AlurakutProfileSidebarMenuDefault githubUser={githubUser} />
       </div>
     </div>
   )
@@ -185,11 +192,11 @@ function AlurakutMenuProfileSidebar({ githubUser }) {
 // ================================================================================================================
 // AlurakutProfileSidebarMenuDefault
 // ================================================================================================================
-export function AlurakutProfileSidebarMenuDefault() {
+export function AlurakutProfileSidebarMenuDefault({ githubUser }) {
   return (
-    <AlurakutProfileSidebarMenuDefault.Wrapper>
+    <AlurakutProfileSidebarMenuDefault.Wrapper githubUser={githubUser}>
       <nav>
-        <a href="/">
+        <a href={`https://github.com/${githubUser}`}>
           <img src={`${BASE_URL}/icons/user.svg`} />
           Perfil
         </a>

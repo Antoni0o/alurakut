@@ -1,11 +1,15 @@
 import React from 'react'
+import Link from 'next/link'
+import nookies from 'nookies';
+import jwt from 'jsonwebtoken';
 import Box from '../src/components/Box'
 import MainGrid from '../src/components/MainGrid'
 import { RelationshipBoxWrapper } from '../src/components/Relationship'
+import RelationshipLink from '../src/components/RelationshipLink'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons'
 
 
-function ProfileSidebar(props) {
+export function ProfileSidebar(props) {
   return (
     <Box as="aside">
       <img src={`https://www.github.com/${props.githubUser}.png`} style={{ borderRadius: '50%' }} alt="foto de perfil" />
@@ -18,7 +22,7 @@ function ProfileSidebar(props) {
       </p>
       <hr />
 
-      <AlurakutProfileSidebarMenuDefault />
+      <AlurakutProfileSidebarMenuDefault githubUser={props.githubUser} />
     </Box>
   )
 }
@@ -33,16 +37,22 @@ function RelationshipBox(props) {
         {limitedRelationships.map((props) => {
           return (
             <li key={props.id}>
-              <a href={`https://github.com/${props.login}`}>
-                <img src={`https://github.com/${props.login}.png`} />
-                <span>{props.login}</span>
-              </a>
+              <Link href={`/usuario/${props.login}`}>
+                <a>
+                  <img src={`https://github.com/${props.login}.png`} />
+                  <span>{props.login}</span>
+                </a>
+              </Link>
             </li>
           )
         })}
       </ul>
 
-    </RelationshipBoxWrapper>
+      <RelationshipLink>
+        <a href={`/amigos/${props.title.toLowerCase()}`}>Ver Mais</a>
+      </RelationshipLink>
+
+    </RelationshipBoxWrapper >
   )
 }
 
@@ -65,18 +75,23 @@ function CommunitiesBox(props) {
           )
         })}
       </ul>
+
+      <RelationshipLink>
+        <a href={`/comunidades`}>Ver Mais</a>
+      </RelationshipLink>
+
     </RelationshipBoxWrapper>
   )
 }
 
-export default function Home() {
-  const githubUser = 'Antoni0o'
+export default function Home(props) {
+  const githubUser = props.githubUser
 
   const [communities, setCommunities] = React.useState([])
   const [following, setFollowing] = React.useState([])
   const [followers, setFollowers] = React.useState([])
   React.useEffect(function () {
-    fetch('https://api.github.com/users/Antoni0o/followers')
+    fetch(`https://api.github.com/users/${githubUser}/followers`)
       .then((serverResponse) => {
         return serverResponse.json()
       })
@@ -84,7 +99,7 @@ export default function Home() {
         setFollowers(completeResponse)
       })
 
-    fetch('https://api.github.com/users/Antoni0o/following')
+    fetch(`https://api.github.com/users/${githubUser}/following`)
       .then((serverResponse) => {
         return serverResponse.json()
       })
@@ -135,7 +150,7 @@ export default function Home() {
           </Box>
 
           <Box>
-            <h2 className="subTitle">O que você deseja fazer?</h2>
+            <h2 className="subTitle">Crie sua comunidade!</h2>
 
             <form onSubmit={function handleCreateCommunity(e) {
               e.preventDefault()
@@ -207,4 +222,31 @@ export default function Home() {
       </MainGrid >
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN
+  const { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+      Authorization: token
+    }
+  })
+    .then((response) => response.json())
+
+  if (!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+  return {
+    props: {
+      githubUser
+    }
+  }
 }
